@@ -5,6 +5,7 @@
 #
 COMPILE_PLATFORM=$(shell uname | sed -e 's/_.*//' | tr '[:upper:]' '[:lower:]' | sed -e 's/\//_/g')
 COMPILE_ARCH=$(shell uname -m | sed -e 's/i.86/x86/' | sed -e 's/^arm.*/arm/')
+EMSCRIPTEN=/home/auriga/Projects/emsdk/upstream/emscripten
 
 ifeq ($(COMPILE_PLATFORM),sunos)
   # Solaris uname and GNU uname differ
@@ -778,9 +779,9 @@ else # ifeq freebsd
 #############################################################################
 
 ifeq ($(PLATFORM),js)
-  CC=/emcc
-  CXX=/emcc
-  RANLIB=/emranlib
+  CC=$(EMSCRIPTEN)/emcc
+  CXX=$(EMSCRIPTEN)/emcc
+  RANLIB=$(EMSCRIPTEN)/emranlib
   ARCH=js
   BINEXT=.js
 # debug optimize flags: --closure 0 --minify 0 -g
@@ -1933,6 +1934,8 @@ Q3OBJ = \
   $(B)/client/snd_openal.o \
   \
   $(B)/client/cl_curl.o \
+  \
+  $(B)/client/cl_xhr.o \
   \
   $(B)/client/sv_ccmds.o \
   $(B)/client/sv_client.o \
