@@ -313,7 +313,7 @@ var LibrarySysCommon = {
 			var fs_basepath = Module.UTF8ToString(_Cvar_VariableString(Module.allocate(intArrayFromString('fs_basepath'), ALLOC_STACK)));
 			var localPath = PATH.join(fs_basepath, name);
 			try {
-				FS.mkdir(PATH.dirname(localPath), 0777);
+				FS.mkdir(PATH.dirname(localPath), 0o777);
 			} catch (e) {
 				if (e.errno !== ERRNO_CODES.EEXIST) {
 					return callback(e);
@@ -619,6 +619,7 @@ var LibrarySysCommon = {
 	},
 	Sys_OpenWithDefault: function (path) {
 		console.log("Sys_OpenWithDefault Not Implemented!");
+		return;
 	},
 	Sys_PathExists: function (ospath, followSymLink) {
 		path = Module.UTF8ToString(ospath);
