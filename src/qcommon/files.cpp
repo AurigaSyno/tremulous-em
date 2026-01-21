@@ -3588,8 +3588,8 @@ static void FS_Startup(const char *gameName, cb_context_t *after )
 
 #if EMSCRIPTEN
 	//fs_cdn = Cvar_Get("fs_cdn", "http://127.0.0.1/assets", CVAR_INIT | CVAR_SERVERINFO); //Auriga: Use 127.0.0.1, nodejs does not like localhost in some cases
-	//fs_cdn = Cvar_Get("fs_cdn", "https://cdn.tremulo.us/base-assets", CVAR_INIT | CVAR_SERVERINFO);
-	fs_cdn = Cvar_Get("fs_cdn", "https://content.tremulous.online/assets", CVAR_INIT | CVAR_SERVERINFO);
+	//fs_cdn = Cvar_Get("fs_cdn", "https://content.tremulous.online/assets", CVAR_INIT | CVAR_SERVERINFO);
+    fs_cdn = Cvar_Get("fs_cdn", "https://cdn.tremulo.us/assets", CVAR_INIT | CVAR_SERVERINFO);
 	fs_manifest = Cvar_Get("fs_manifest", "", CVAR_ROM | CVAR_SERVERINFO);
 	fs_completeManifest = Cvar_Get("fs_completeManifest", "", CVAR_ROM);
     Com_Printf("Using content server: %s\n", fs_cdn->string);
