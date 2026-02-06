@@ -3040,7 +3040,9 @@ static void CL_ServersWebResponsePacket(const netadr_t *from, msg_t *msg, bool e
         addresses[numservers].port += *buffptr++;
         addresses[numservers].port = BigShort(addresses[numservers].port);
 
-        Com_Printf("%s resolved to %s\n", domain, NET_AdrToStringwPort(addresses[numservers]));
+        Com_Printf("%s%s resolved to %s\n",
+            (!strlen(label) ? "" : va("%s server ", label)),
+            domain, NET_AdrToStringwPort(addresses[numservers]));
         // syntax check
         if (*buffptr != '\\' && *buffptr != '/') break;
 
