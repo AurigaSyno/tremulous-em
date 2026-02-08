@@ -535,6 +535,15 @@ const char *NET_AdrToStringwPort(netadr_t a)
     return s;
 }
 
+const char *NET_AdrPortString(netadr_t a)
+{
+    static char s[6];
+
+    Com_sprintf(s, sizeof(s), "%hu", ntohs(a.port));
+
+    return s;
+}
+
 bool NET_CompareAdr(netadr_t a, netadr_t b)
 {
     if (!NET_CompareBaseAdr(a, b)) return false;

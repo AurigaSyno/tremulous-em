@@ -346,7 +346,12 @@ static void LAN_GetServerAddressString(int source, int n, char *buf, int buflen)
         case AS_GLOBAL:
             if (n >= 0 && n < MAX_GLOBAL_SERVERS)
             {
-                Q_strncpyz(buf, NET_AdrToStringwPort(cls.globalServers[n].adr), buflen);
+                if(strlen(cls.globalServers[n].domainName)) //if there is a servername, use it
+                    Q_strncpyz(buf, va("%s:%s", cls.globalServers[n].domainName, 
+                        NET_AdrPortString(cls.globalServers[n].adr)), buflen);
+                else
+                    Q_strncpyz(buf, NET_AdrToStringwPort(cls.globalServers[n].adr), buflen);
+
                 if (cls.globalServers[n].adr.alternateProtocol != 0)
                     Q_strncpyz(buf + (int)strlen(buf),
                         (cls.globalServers[n].adr.alternateProtocol == 1 ? " -g" : " -1"), buflen - (int)strlen(buf));
@@ -356,7 +361,12 @@ static void LAN_GetServerAddressString(int source, int n, char *buf, int buflen)
         case AS_FAVORITES:
             if (n >= 0 && n < MAX_OTHER_SERVERS)
             {
-                Q_strncpyz(buf, NET_AdrToStringwPort(cls.favoriteServers[n].adr), buflen);
+                if(strlen(cls.favoriteServers[n].domainName)) //if there is a servername, use it
+                    Q_strncpyz(buf, va("%s:%s", cls.favoriteServers[n].domainName, 
+                        NET_AdrPortString(cls.favoriteServers[n].adr)), buflen);
+                else
+                    Q_strncpyz(buf, NET_AdrToStringwPort(cls.favoriteServers[n].adr), buflen);
+
                 if (cls.favoriteServers[n].adr.alternateProtocol != 0)
                     Q_strncpyz(buf + (int)strlen(buf),
                         (cls.favoriteServers[n].adr.alternateProtocol == 1 ? " -g" : " -1"), buflen - (int)strlen(buf));
@@ -424,6 +434,7 @@ static void LAN_GetServerInfo(int source, int n, char *buf, int buflen)
         Info_SetValueForKey(info, "game", server->game);
         Info_SetValueForKey(info, "gametype", va("%i", server->gameType));
         Info_SetValueForKey(info, "nettype", va("%i", server->netType));
+        Info_SetValueForKey(info, "servername", server->domainName);
         Info_SetValueForKey(info, "addr", NET_AdrToStringwPort(server->adr));
         Q_strncpyz(buf, info, buflen);
     }

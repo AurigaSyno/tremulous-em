@@ -75,6 +75,7 @@ bool NET_CompareBaseAdr(struct netadr_t a, struct netadr_t b);
 bool NET_IsLocalAddress(struct netadr_t adr);
 const char *NET_AdrToString(struct netadr_t a);
 const char *NET_AdrToStringwPort(struct netadr_t a);
+const char *NET_AdrPortString(struct netadr_t a);
 int NET_StringToAdr(const char *s, struct netadr_t *a, enum netadrtype_t family);
 bool NET_GetLoopPacket(netsrc_t sock, struct netadr_t *net_from, struct msg_t *net_message);
 void NET_JoinMulticast6(void);

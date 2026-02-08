@@ -381,6 +381,7 @@ struct ping_t {
 #define MAX_FEATLABEL_CHARS 32
 struct serverInfo_t {
     netadr_t adr;
+    char domainName[MAX_FQDN_NAME]; //domain name of server
     char hostName[MAX_HOSTNAME_LENGTH];
     char mapName[MAX_NAME_LENGTH];
     char game[MAX_NAME_LENGTH];

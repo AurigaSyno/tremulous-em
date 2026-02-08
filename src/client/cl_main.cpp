@@ -2687,6 +2687,7 @@ static void CL_InitServerInfo(serverInfo_t *server, netadr_t *address)
 {
     server->adr = *address;
     server->clients = 0;
+    server->domainName[0] = '\0';
     server->hostName[0] = '\0';
     server->mapName[0] = '\0';
     server->label[0] = '\0';
@@ -2929,6 +2930,11 @@ static void CL_ServersResponsePacket(const netadr_t *from, msg_t *msg, bool exte
     Com_Printf("%d servers parsed (total %d)\n", numservers, total);
 }
 
+/*
+===================
+CL_ServersWebResponsePacket
+===================
+*/
 static void CL_ServersWebResponsePacket(const netadr_t *from, msg_t *msg, bool extended)
 {
     int i, count, length, total;
@@ -3768,6 +3774,7 @@ static void CL_SetServerInfo(serverInfo_t *server, const char *info, int ping)
         if (info)
         {
             server->clients = atoi(Info_ValueForKey(info, "clients"));
+            Q_strncpyz(server->domainName, Info_ValueForKey(info, "servername"), MAX_FQDN_NAME);
             Q_strncpyz(server->hostName, Info_ValueForKey(info, "hostname"), MAX_HOSTNAME_LENGTH);
             Q_strncpyz(server->mapName, Info_ValueForKey(info, "mapname"), MAX_NAME_LENGTH);
             server->maxClients = atoi(Info_ValueForKey(info, "sv_maxclients"));
