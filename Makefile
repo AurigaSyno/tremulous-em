@@ -408,6 +408,7 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu" "gnu")
   SHLIBEXT=so
   SHLIBCFLAGS=-fPIC -fvisibility=hidden
   SHLIBLDFLAGS=-shared
+		SHLIBVMLDFLAGS=$(SHLIBLDFLAGS)
   #$(LDFLAGS)
 
   THREAD_LIBS=-lpthread
@@ -546,6 +547,7 @@ ifeq ($(PLATFORM),darwin)
   SHLIBCFLAGS=-fPIC -fno-common
   #SHLIBLDFLAGS=-dynamiclib $(LDFLAGS) -Wl,-U,_com_altivec
   SHLIBLDFLAGS=-dynamiclib -Wl,-U,_com_altivec
+		SHLIBVMLDFLAGS=$(SHLIBLDFLAGS)
  
   NOTSHLIBCFLAGS=-mdynamic-no-pic
 
@@ -650,6 +652,7 @@ ifdef MINGW
   SHLIBCFLAGS=
   #SHLIBLDFLAGS=-shared $(LDFLAGS)
   SHLIBLDFLAGS=-shared
+		SHLIBVMLDFLAGS=$(SHLIBLDFLAGS)
 
   BINEXT=.exe
 
@@ -735,6 +738,7 @@ ifeq ($(PLATFORM),freebsd)
   SHLIBCFLAGS=-fPIC
   #SHLIBLDFLAGS=-shared $(LDFLAGS)
   SHLIBLDFLAGS=-shared
+		SHLIBVMLDFLAGS=$(SHLIBLDFLAGS)
 
   THREAD_LIBS=-lpthread
   # don't need -ldl (FreeBSD)
@@ -800,7 +804,7 @@ ifeq ($(PLATFORM),js)
   USE_MUMBLE=0
   USE_VOIP=0
   USE_OPENAL_DLOPEN=0
-  USE_RENDERER_DLOPEN=0
+  USE_RENDERER_DLOPEN=1
   USE_LOCAL_HEADERS=0
   USE_RESTCLIENT=0
 
@@ -811,6 +815,7 @@ ifeq ($(PLATFORM),js)
 
   CLIENT_LDFLAGS += --js-library $(LIBSYSCOMMON) \
     --js-library $(LIBSYSBROWSER) \
+				-s MAIN_MODULE=2 \
     -s MODULARIZE=1 \
     -s WASM=1 \
     -s INVOKE_RUN=0 \
@@ -824,6 +829,7 @@ ifeq ($(PLATFORM),js)
     -s ASSERTIONS=1 \
     -s GL_ENABLE_GET_PROC_ADDRESS \
     -s USE_WEBGL2=1 \
+				-s USE_SDL=2 \
     -s RESERVED_FUNCTION_POINTERS=1 \
     -s STACK_SIZE=268435456 \
     -s TOTAL_MEMORY=805306368 \
@@ -845,12 +851,17 @@ ifeq ($(PLATFORM),js)
     -s EXPORT_NAME=\"tremded\" \
     $(OPTIMIZE)
 
-  SHLIBEXT=js
+  SHLIBEXT=wasm
   SHLIBNAME=.$(SHLIBEXT)
-  SHLIBLDFLAGS=$(LDFLAGS) \
+		SHLIBVMLDFLAGS=$(LDFLAGS) \
     -s INVOKE_RUN=0 \
     -s EXPORTED_FUNCTIONS="['_vmMain', '_dllEntry']" \
-    -s SIDE_MODULE=1 \
+    -s SIDE_MODULE=2 \
+    $(OPTIMIZE)
+  SHLIBLDFLAGS=$(LDFLAGS) \
+    -s INVOKE_RUN=0 \
+    -s EXPORTED_FUNCTIONS="['_GetRefAPI']" \
+    -s SIDE_MODULE=2 \
     $(OPTIMIZE)
 
   CLIENT_CFLAGS += -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=['png','jpg']
@@ -2595,7 +2606,7 @@ CGVMOBJ = $(CGOBJ_:%.o=%.asm)
 
 $(B)/$(BASEGAME)/cgame$(SHLIBNAME): $(CGOBJ) $(LIBVM)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CXX) $(SHLIBLDFLAGS) $(LDFLAGS) -o $@ $(CGOBJ)
+	$(Q)$(CXX) $(SHLIBVMLDFLAGS) $(LDFLAGS) -o $@ $(CGOBJ)
 
 $(B)/$(BASEGAME)/vm/cgame.qvm: $(CGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
@@ -2689,7 +2700,7 @@ GVMOBJ = $(GOBJ_:%.o=%.asm)
 
 $(B)/$(BASEGAME)/game$(SHLIBNAME): $(GOBJ)  $(LIBVM)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CXX) $(SHLIBLDFLAGS) $(LDFLAGS) -o $@ $(GOBJ)
+	$(Q)$(CXX) $(SHLIBVMLDFLAGS) $(LDFLAGS) -o $@ $(GOBJ)
 
 $(B)/$(BASEGAME)/vm/game.qvm: $(GVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
@@ -2719,7 +2730,7 @@ UIVMOBJ = $(UIOBJ_:%.o=%.asm)
 
 $(B)/$(BASEGAME)/ui$(SHLIBNAME): $(UIOBJ) $(LIBVM)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CXX) -I${ASSETS_DIR}/ui $(SHLIBLDFLAGS) $(LDFLAGS) -o $@ $(UIOBJ)
+	$(Q)$(CXX) -I${ASSETS_DIR}/ui $(SHLIBVMLDFLAGS) $(LDFLAGS) -o $@ $(UIOBJ)
 
 $(B)/$(BASEGAME)/vm/ui.qvm: $(UIVMOBJ) $(UIDIR)/ui_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
