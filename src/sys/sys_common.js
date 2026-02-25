@@ -134,6 +134,10 @@ var LibrarySysCommon = {
 		so: [
 			{ src: 'vm/game.so', dest: 'gpp/vm/game.so' }
 		],
+		shlibs: [
+			{ src: 'renderer_opengl1.wasm', dest: 'gpp/renderer_opengl1.wasm', checksum: 1325977558 },
+			{ src: 'renderer_opengl2.wasm', dest: 'gpp/renderer_opengl2.wasm', checksum: 2477155053 }
+		],
 		manifest: null,
 		Print: function (str) {
 			str = Module.allocate(intArrayFromString(str + '\n'), ALLOC_STACK);
@@ -383,6 +387,40 @@ var LibrarySysCommon = {
 			}
 			return qvms;
 		},
+		ValidateShlib: function (shlib) {
+			var fs_basepath = Module.UTF8ToString(_Cvar_VariableString(Module.allocate(intArrayFromString('fs_basepath'), ALLOC_STACK)));
+			var localPath = PATH.join(fs_basepath, shlib.dest);
+			var crc = SYSC.CRC32File(localPath);
+			if (crc !== shlib.checksum) {
+				return false;
+			}
+			return true;
+		},
+		DirtyShlib: function(callback) {
+			var shlibs = [];
+			var assets = SYSC.GetManifest();
+			for (var i = 0; i < SYSC.shlibs.length; i++) {
+				var shlib = SYSC.shlibs[i];
+
+				var asset;
+				for (var j = 0; j < assets.length; j++) {
+					if (assets[j].name === shlib.src) {
+						asset = assets[j];
+						break;
+					}
+				}
+				if(!asset) {
+					return callback(new Error('DirtyShlib: Failed to find "' + shlib.src + '" in manifest'));
+				}
+				if (!SYSC.ValidateShlib(shlib)) {
+					// append the shilb info to the asset
+					asset.shlib = shlib;
+
+					shlibs.push(asset);
+				}
+			}
+			return shlibs;
+		},
 		/*ValidateInstaller: function (installer) {
 			var fs_basepath = Module.UTF8ToString(_Cvar_VariableString(Module.allocate(intArrayFromString('fs_basepath'), ALLOC_STACK)));
 			var fs_basepath = Module.UTF8ToString(_Cvar_VariableString(Module.allocate(intArrayFromString('fs_basepath'), ALLOC_STACK)));
@@ -541,6 +579,7 @@ var LibrarySysCommon = {
 		SyncFiles: function (callback) {
 			var downloads = SYSC.DirtyPaks(callback);
 			//downloads = downloads.concat(SYSC.DirtyQVM(callback));
+			downloads = downloads.concat(SYSC.DirtyShlib(callback));
 
 			//Remove any files in base that don't belong
 			SYSC.ClearBaseDir();
