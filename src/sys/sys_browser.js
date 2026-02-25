@@ -269,6 +269,7 @@ var LibrarySys = {
 			Module['canvas'].remove();
 		}
 	},
+	Sys_GLimpInit__sig: 'v',
 	Sys_GLimpInit: function () {
 		var viewport = Module['viewport'];
 
@@ -282,6 +283,7 @@ var LibrarySys = {
 			Module['canvas'] = viewport.appendChild(canvas);
 		}
 	},
+	Sys_GLimpSafeInit__sig: 'v',
 	Sys_GLimpSafeInit: function () {
 	},
 	Sys_FS_Startup__deps: ['$Browser', '$FS', '$IDBFS', '$SYSC'],
@@ -360,6 +362,7 @@ var LibrarySys = {
 			});
 		});
 	},
+	Sys_Milliseconds__sig: 'v',
 	Sys_Milliseconds: function () {
 		if (!SYS.timeBase) {
 			SYS.timeBase = Date.now();

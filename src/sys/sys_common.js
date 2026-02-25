@@ -611,12 +611,14 @@ var LibrarySysCommon = {
 	Sys_DefaultHomePath: function () {
 		return 0;
 	},
+	Sys_RandomBytes__sig: 'iii',
 	Sys_RandomBytes: function (string, len) {
 		return false;
 	},
 	Sys_GetClipboardData: function () {
 		return 0;
 	},
+	Sys_LowPhysicalMemory__sig: 'v',
 	Sys_LowPhysicalMemory: function () {
 		return false;
 	},
