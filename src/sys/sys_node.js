@@ -135,7 +135,7 @@ var LibrarySys = {
 		try {
 			dir = FS.mkdir(fs_basepath, 0777);
 		} catch (e) {
-			if (!(e instanceof FS.ErrnoError) || e.errno !== ERRNO_CODES.EEXIST) {
+			if (!(e instanceof FS.ErrnoError) || e.errno !== {{{ cDefs.EEXIST }}}) {
 				SYSC.Error('fatal', e.message);
 			}
 		}
@@ -143,7 +143,7 @@ var LibrarySys = {
 		try {
 			FS.mount(NODEFS, { root: localPath }, fs_basepath);
 		} catch (e) {
-			if (!(e instanceof FS.ErrnoError) || e.errno !== ERRNO_CODES.EBUSY) {
+			if (!(e instanceof FS.ErrnoError) || e.errno !== {{{ cDefs.EBUSY }}}) {
 				SYSC.Error('fatal', e.message);
 			}
 		}

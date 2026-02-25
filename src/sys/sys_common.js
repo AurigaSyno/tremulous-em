@@ -135,8 +135,8 @@ var LibrarySysCommon = {
 			{ src: 'vm/game.so', dest: 'gpp/vm/game.so' }
 		],
 		shlibs: [
-			{ src: 'renderer_opengl1.wasm', dest: 'gpp/renderer_opengl1.wasm', checksum: 1325977558 },
-			{ src: 'renderer_opengl2.wasm', dest: 'gpp/renderer_opengl2.wasm', checksum: 2477155053 }
+			{ src: 'renderer_opengl1.wasm', dest: 'renderer_opengl1.wasm', checksum: 1325977558 },
+			{ src: 'renderer_opengl2.wasm', dest: 'renderer_opengl2.wasm', checksum: 2477155053 }
 		],
 		manifest: null,
 		Print: function (str) {
@@ -323,9 +323,9 @@ var LibrarySysCommon = {
 				var localPath = PATH.join(fs_basepath, name);
 			}
 			try {
-				FS.mkdir(PATH.dirname(localPath), 0777);
+				FS.mkdir(PATH.dirname(localPath), 0o777);
 			} catch (e) {
-				if (e.errno !== ERRNO_CODES.EEXIST) {
+				if (e.errno !== {{{ cDefs.EEXIST }}}) {
 					return callback(e);
 				}
 			}
@@ -414,8 +414,7 @@ var LibrarySysCommon = {
 				}
 				if (!SYSC.ValidateShlib(shlib)) {
 					// append the shilb info to the asset
-					asset.shlib = shlib;
-
+					asset.dest = shlib.dest;
 					shlibs.push(asset);
 				}
 			}
@@ -576,10 +575,27 @@ var LibrarySysCommon = {
 				}
 			}
 		},
+		SyncCore: function(callback) {
+			console.log('SyncCore called'); //REMOVE
+			var downloads = SYSC.DirtyShlib(callback)
+
+			//Download all core files (.wasm, etc) we need from CDN
+			SYSC.DownloadAssets(downloads, function (asset) {
+				SYS.LoadingDescription('loading ' + asset.name);
+			}, function (loaded, total) {
+				SYS.LoadingProgress(loaded / total);
+			}, function (asset, data, next) {
+				SYSC.SaveFile(asset.dest, data, false, next);
+			}, function (err) {
+				SYS.LoadingDescription(null);
+				setTimeout(function () {
+					callback(err);
+				});
+			});
+		},
 		SyncFiles: function (callback) {
 			var downloads = SYSC.DirtyPaks(callback);
 			//downloads = downloads.concat(SYSC.DirtyQVM(callback));
-			downloads = downloads.concat(SYSC.DirtyShlib(callback));
 
 			//Remove any files in base that don't belong
 			SYSC.ClearBaseDir();
@@ -601,6 +617,7 @@ var LibrarySysCommon = {
 		FS_Startup: function (callback) {
 			SYSC.UpdateManifest(function (err) {
 				if (err) return callback(err);
+				SYSC.SyncCore(callback);
 				SYSC.SyncFiles(callback);
 			});
 		},
@@ -733,7 +750,7 @@ var LibrarySysCommon = {
 			if (!(e instanceof FS.ErrnoError)) {
 				SYSC.Error('drop', e.message);
 			}
-			return e.errno === ERRNO_CODES.EEXIST;
+			return e.errno === {{{ cDefs.EEXIST }}};
 		}
 		return true;
 	},
@@ -756,8 +773,9 @@ var LibrarySysCommon = {
 	Sys_CryptoRandomBytes: function (buf, length) {
 		console.log("Sys_CryptoRandomBytes Not Implemented!");
 	},
-	Sys_DllExtension: function (filename) {
-		var DLL_EXT = ".so" //Auriga: This needs to match DLL_EXT, but I don't know how to get that value here
+	Sys_DllExtension: function (name) {
+		const filename = Module.UTF8ToString(name);
+		var DLL_EXT = ".wasm" //Auriga: This needs to match DLL_EXT, but I don't know how to get that value here
 		var inlen = filename.length;
 		var extlen = DLL_EXT.length;
 
