@@ -363,7 +363,7 @@ extern "C" {
 
     #define ARCH_STRING ""
 
-    #define DLL_EXT ".js"
+    #define DLL_EXT ".wasm"
     #define EXE_EXT
 
     #define Q3_LITTLE_ENDIAN
