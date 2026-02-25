@@ -823,17 +823,20 @@ ifeq ($(PLATFORM),js)
     -s EXPORTED_FUNCTIONS="['_main', '_malloc', '_free', '_atof', '_Com_Error', '_Com_ProxyCallback', '_Com_GetCDN', '_Com_GetManifest', '_Z_Malloc', '_Z_Free', '_S_Malloc', '_Cvar_Set', '_Cvar_VariableString', '_VM_GetCurrent', '_VM_SetCurrent']" \
     -s EXPORTED_RUNTIME_METHODS="['callMain', 'run', 'allocate', 'UTF8ToString', 'stringToUTF8', 'addFunction']" \
     -s LEGACY_GL_EMULATION=1 \
+    -s GL_UNSAFE_OPTS=0 \
     -s WEBSOCKET_URL=wss:// \
     -s WEBSOCKET_SUBPROTOCOL=binary \
     -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=0 \
     -s ASSERTIONS=1 \
     -s GL_ENABLE_GET_PROC_ADDRESS \
     -s USE_WEBGL2=1 \
-				-s USE_SDL=2 \
+		-s USE_SDL=2 \
     -s RESERVED_FUNCTION_POINTERS=1 \
     -s STACK_SIZE=268435456 \
     -s TOTAL_MEMORY=805306368 \
     -s ALLOW_MEMORY_GROWTH=1 \
+    -s ALLOW_TABLE_GROWTH=1 \
+    -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
     -s EXPORT_NAME=\"tremulous\" \
     $(OPTIMIZE)
 
@@ -862,6 +865,8 @@ ifeq ($(PLATFORM),js)
     -s INVOKE_RUN=0 \
     -s EXPORTED_FUNCTIONS="['_GetRefAPI']" \
     -s SIDE_MODULE=2 \
+    -s LEGACY_GL_EMULATION=1 \
+    -s GL_UNSAFE_OPTS=0 \
     $(OPTIMIZE)
 
   CLIENT_CFLAGS += -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=['png','jpg']
